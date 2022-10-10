@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  golang:
+    container_name: go-crud-demo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    volumes:
+      - ../:/workspaces
+  postgresql:
+    image: postgres:15rc2-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: go-demo
+      POSTGRES_PASSWORD: password
+      PGPASSWORD: password123
+      POSTGRES_DB: go-demo
+    ports:
+      - "5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  postgres-gui:
+    image: sosedoff/pgweb
+    container_name: "pgweb"
+    ports:
+      - "8081"
+    depends_on:
+      - postgresql
+
+volumes:
+  postgres-data:

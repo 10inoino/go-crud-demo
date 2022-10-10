@@ -1,0 +1,14 @@
+{
+	"name": "go-crud-demo",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "golang",
+	"workspaceFolder": "/workspaces",
+	"settings": {},
+	"extensions": [
+		"yzhang.markdown-all-in-one",
+		"eamodio.gitlens",
+		"wayou.vscode-todo-highlightx",
+		"golang.go"
+	],
+	"postStartCommand": "go install"
+}
