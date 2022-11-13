@@ -8,6 +8,11 @@ services:
     command: /bin/sh -c "while sleep 1000; do :; done"
     volumes:
       - ../:/workspaces
+    environment:
+      POSTGRES_USER: go-demo
+      POSTGRES_PASSWORD: password
+      PGPASSWORD: password123
+      POSTGRES_DB: go-demo
   postgresql:
     image: postgres:15rc2-alpine
     restart: always
