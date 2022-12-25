@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	_ "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type album struct {
@@ -18,20 +19,26 @@ type album struct {
 }
 
 func getAlbums(c *gin.Context) {
-	db, dbErr := sql.Open("psql", "postgresql:5432")
+	db, dbErr := sql.Open(
+		"postgres",
+		"host=postgresql dbname=go-demo user=go-demo password=password sslmode=disable")
 	if dbErr != nil {
 		fmt.Print(dbErr)
+		return
 	}
 	m, err := models.Albums().All(c, db)
 	if err != nil {
 		fmt.Print(err)
+		return
 	}
 
 	c.IndentedJSON(http.StatusOK, m)
 }
 
 func postAlbums(c *gin.Context) {
-	db, dbErr := sql.Open("psql", "postgresql:5432")
+	db, dbErr := sql.Open(
+		"postgres",
+		"host=postgresql dbname=go-demo user=go-demo password=password sslmode=disable")
 	if dbErr != nil {
 		fmt.Print(dbErr)
 	}
