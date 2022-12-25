@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	_ "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type album struct {

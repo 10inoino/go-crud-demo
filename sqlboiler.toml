@@ -4,10 +4,5 @@ no-tests = true
 add-enum-types = true
 
 [psql]
-  dbname = "go-demo"
-  host   = "postgresql"
-  port   = 5432
-  user   = "go-demo"
-  pass   = "password"
   sslmode = "disable"
   blacklist = ["gorp_migrations"]
