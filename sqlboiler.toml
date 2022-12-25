@@ -1,0 +1,7 @@
+output   = "web-service-gin/db/models"
+wipe     = true
+add-enum-types = true
+
+[psql]
+  sslmode = "disable"
+  blacklist = ["gorp_migrations"]

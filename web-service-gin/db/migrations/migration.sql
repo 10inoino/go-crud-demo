@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE album(id int, title text, artist text, price int);
+CREATE TABLE album(id text primary key, title text not null, artist text not null, price int not null);
 
 -- +migrate Down
 DROP TABLE album;
