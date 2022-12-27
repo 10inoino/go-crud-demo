@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"example/web-service-gin/db/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,70 +19,121 @@ type album struct {
 	Price  int    `json:"price"`
 }
 
-func getAlbums(c *gin.Context) {
-	db, dbErr := sql.Open(
-		"postgres",
-		"host=postgresql dbname=go-demo user=go-demo password=password sslmode=disable")
-	if dbErr != nil {
-		fmt.Print(dbErr)
-		return
+func NewAlbum(id string, title string, artist string, price int) (*album, error) {
+	return &album{
+		ID:     id,
+		Title:  title,
+		Artist: artist,
+		Price:  price,
+	}, nil
+}
+
+type AlbumRepository struct {
+	db *sql.DB
+}
+
+func NewAlbumRepository(db *sql.DB) *AlbumRepository {
+	return &AlbumRepository{
+		db: db,
 	}
-	m, err := models.Albums().All(c, db)
-	if err != nil {
-		fmt.Print(err)
-		return
+}
+
+func (repo *AlbumRepository) Save(ctx *gin.Context, album album) error {
+	saveTarget := &models.Album{
+		ID:     album.ID,
+		Title:  album.Title,
+		Artist: album.Artist,
+		Price:  album.Price,
 	}
 
-	c.IndentedJSON(http.StatusOK, m)
+	err := saveTarget.Insert(ctx, repo.db, boil.Infer())
+	return err
+}
+
+func (repo *AlbumRepository) FindAll(ctx *gin.Context) (*[]album, error) {
+	m, err := models.Albums().All(ctx, repo.db)
+	if err != nil {
+		return nil, errors.New("failed get albums")
+	}
+
+	result := make([]album, len(m))
+	// TODO:関数化したい
+	for i, a := range m {
+		album, _ := NewAlbum(a.ID, a.Title, a.Artist, a.Price)
+		result[i] = *album
+	}
+	return &result, nil
+}
+
+func (repo *AlbumRepository) FindById(ctx *gin.Context, id string) (*album, error) {
+	m, err := models.Albums(
+		qm.Where("id=?", id),
+	).One(ctx, repo.db)
+	if err != nil {
+		return nil, errors.New("failed find album")
+	}
+	album, _ := NewAlbum(m.ID, m.Title, m.Artist, m.Price)
+	return album, nil
+}
+
+func generateDB() (*sql.DB, error) {
+	return sql.Open(
+		"postgres",
+		"host=postgresql dbname=go-demo user=go-demo password=password sslmode=disable")
+}
+
+func getAlbums(c *gin.Context) {
+	db, dbErr := generateDB()
+	if dbErr != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed database connection"})
+		return
+	}
+	albumRepo := NewAlbumRepository(db)
+	album, err := albumRepo.FindAll(c)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, album)
 }
 
 func postAlbums(c *gin.Context) {
-	db, dbErr := sql.Open(
-		"postgres",
-		"host=postgresql dbname=go-demo user=go-demo password=password sslmode=disable")
+	db, dbErr := generateDB()
 	if dbErr != nil {
-		fmt.Print(dbErr)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed database connection"})
+		return
 	}
+	albumRepo := NewAlbumRepository(db)
 	var newAlbum album
 	if err := c.BindJSON(&newAlbum); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed bind json"})
+		return
+	}
+	err := albumRepo.Save(c, newAlbum)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
-	album := &models.Album{
-		ID:     newAlbum.ID,
-		Title:  newAlbum.Title,
-		Artist: newAlbum.Artist,
-		Price:  newAlbum.Price,
-	}
-
-	err := album.Insert(c, db, boil.Infer())
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	c.IndentedJSON(http.StatusCreated, album)
+	c.IndentedJSON(http.StatusCreated, "OK")
 }
 
 func getAlbumByID(c *gin.Context) {
-	id := c.Param("id")
-	db, dbErr := sql.Open(
-		"postgres",
-		"host=postgresql dbname=go-demo user=go-demo password=password sslmode=disable")
+	db, dbErr := generateDB()
 	if dbErr != nil {
-		fmt.Print(dbErr)
-	}
-	m, err := models.Albums(
-		qm.Where("id=?", id),
-	).One(c, db)
-	if err == sql.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed database connection"})
 		return
-	} else if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
+	}
+	albumRepo := NewAlbumRepository(db)
+	id := c.Param("id")
+	album, err := albumRepo.FindById(c, id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed find data"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, m)
+	c.IndentedJSON(http.StatusOK, album)
 }
 
 func main() {
