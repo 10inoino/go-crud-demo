@@ -59,3 +59,16 @@ func (repo *AlbumRepository) FindById(ctx *gin.Context, id string) (*domain.Albu
 	album, _ := domain.NewAlbum(m.ID, m.Title, m.Artist, m.Price)
 	return album, nil
 }
+
+func (repo *AlbumRepository) DeleteById(ctx *gin.Context, id string) error {
+	m, err := models.FindAlbum(ctx, repo.db, id)
+	if err != nil {
+		return err
+	}
+
+	_, delErr := m.Delete(ctx, repo.db)
+	if delErr != nil {
+		return err
+	}
+	return nil
+}
