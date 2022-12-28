@@ -7,7 +7,7 @@
 	"extensions": [
 		"yzhang.markdown-all-in-one",
 		"eamodio.gitlens",
-		"wayou.vscode-todo-highlightx",
+		"wayou.vscode-todo-highlight",
 		"golang.go"
 	],
 	"postStartCommand": "go install"
