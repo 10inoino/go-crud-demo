@@ -65,8 +65,23 @@ func (repo *AlbumRepository) DeleteById(ctx *gin.Context, id string) error {
 	if err != nil {
 		return err
 	}
-
 	_, delErr := m.Delete(ctx, repo.db)
+	if delErr != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *AlbumRepository) Update(ctx *gin.Context, album domain.Album) error {
+	m, err := models.FindAlbum(ctx, repo.db, album.ID)
+	if err != nil {
+		return err
+	}
+	m.ID = album.ID
+	m.Title = album.Title
+	m.Artist = album.Artist
+	m.Price = album.Price
+	_, delErr := m.Update(ctx, repo.db, boil.Infer())
 	if delErr != nil {
 		return err
 	}
