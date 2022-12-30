@@ -15,3 +15,10 @@ func NewAlbum(id string, title string, artist string, price int) (*Album, error)
 		Price:  price,
 	}, nil
 }
+
+func (a *Album) Update(title string, artist string, price int) error {
+	a.Title = title
+	a.Artist = artist
+	a.Price = price
+	return nil
+}

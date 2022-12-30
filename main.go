@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"example/web-service-gin/src/controller"
-	"example/web-service-gin/src/repository"
+	"example/web-service-gin/src/repository/postgres/repository"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +21,7 @@ func main() {
 		panic("failed database connection")
 	}
 	albumRepo := repository.NewAlbumRepository(db)
-	albumCon := controller.NewAlbumController(*albumRepo)
+	albumCon := controller.NewAlbumController(albumRepo)
 
 	router.GET("/albums", albumCon.GetAlbums)
 	router.GET("/albums/:id", albumCon.GetAlbumByID)
