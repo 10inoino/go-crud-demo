@@ -41,7 +41,6 @@ func (repo *AlbumRepository) FindAll(ctx *gin.Context) (*[]domain.Album, error) 
 	}
 
 	result := make([]domain.Album, len(m))
-	// TODO:関数化したい
 	for i, a := range m {
 		album, _ := domain.NewAlbum(a.ID, a.Title, a.Artist, a.Price)
 		result[i] = *album

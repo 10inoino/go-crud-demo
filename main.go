@@ -25,7 +25,9 @@ func main() {
 
 	router.GET("/albums", albumCon.GetAlbums)
 	router.GET("/albums/:id", albumCon.GetAlbumByID)
-	router.POST("/albums", albumCon.PostAlbum)
+	router.POST("/albums", albumCon.CreateAlbum)
+	router.PUT("/albums", albumCon.UpdateAlbum)
+	router.DELETE("/albums/:id", albumCon.DeleteAlbum)
 
 	router.Run("localhost:8080")
 }

@@ -34,20 +34,47 @@ func (con *AlbumController) GetAlbumByID(ctx *gin.Context) {
 	album, err := con.albumRepo.FindById(ctx, id)
 
 	if err != nil {
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed find data"})
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
 	ctx.IndentedJSON(http.StatusOK, album)
 }
 
-func (con *AlbumController) PostAlbum(ctx *gin.Context) {
+func (con *AlbumController) CreateAlbum(ctx *gin.Context) {
 	var newAlbum domain.Album
 	if err := ctx.BindJSON(&newAlbum); err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed bind json"})
 		return
 	}
 	err := con.albumRepo.Save(ctx, newAlbum)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusCreated, "OK")
+}
+
+func (con *AlbumController) DeleteAlbum(ctx *gin.Context) {
+	id := ctx.Param("id")
+	err := con.albumRepo.DeleteById(ctx, id)
+
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, "OK")
+}
+
+func (con *AlbumController) UpdateAlbum(ctx *gin.Context) {
+	var newAlbum domain.Album
+	if err := ctx.BindJSON(&newAlbum); err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed bind json"})
+		return
+	}
+	err := con.albumRepo.Update(ctx, newAlbum)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
