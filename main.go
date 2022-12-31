@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"example/web-service-gin/src/controller"
+	"example/web-service-gin/src/presentation/controller"
 	"example/web-service-gin/src/repository/postgres/repository"
 	"example/web-service-gin/src/usecase"
 
