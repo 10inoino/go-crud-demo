@@ -9,10 +9,6 @@ services:
     volumes:
       - ../:/workspaces
     environment:
-      POSTGRES_USER: go-demo
-      POSTGRES_PASSWORD: password
-      PGPASSWORD: password123
-      POSTGRES_DB: go-demo
       PSQL_DBNAME: go-demo
       PSQL_HOST: postgresql
       PSQL_PORT: 5432
