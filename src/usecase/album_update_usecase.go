@@ -6,19 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AlbumUpdateUsecase struct {
+type UpdateAlbumUsecase struct {
 	albumRepo repository_interface.AlbumRepository
 }
 
-func NewAlbumUpdateUsecase(
+func NewUpdateAlbumUsecase(
 	albumRepo repository_interface.AlbumRepository,
-) *AlbumUpdateUsecase {
-	return &AlbumUpdateUsecase{
+) *UpdateAlbumUsecase {
+	return &UpdateAlbumUsecase{
 		albumRepo: albumRepo,
 	}
 }
 
-func (usecase *AlbumUpdateUsecase) Execute(
+func (usecase *UpdateAlbumUsecase) Execute(
 	ctx *gin.Context,
 	id string,
 	title string,

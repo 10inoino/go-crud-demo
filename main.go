@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"example/web-service-gin/src/controller"
 	"example/web-service-gin/src/repository/postgres/repository"
+	"example/web-service-gin/src/usecase"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,9 +22,20 @@ func main() {
 		panic("failed database connection")
 	}
 	albumRepo := repository.NewAlbumRepository(db)
-	albumCon := controller.NewAlbumController(albumRepo)
+	createAlbumUsecase := usecase.NewCreateAlbumUsecase(albumRepo)
+	getAlbumUsecase := usecase.NewGetAlbumUsecase(albumRepo)
+	listAlbumUsecase := usecase.NewListAlbumUsecase(albumRepo)
+	updateAlbumUsecase := usecase.NewUpdateAlbumUsecase(albumRepo)
+	deleteAlbumUsecase := usecase.NewDeleteAlbumUsecase(albumRepo)
+	albumCon := controller.NewAlbumController(
+		*createAlbumUsecase,
+		*getAlbumUsecase,
+		*listAlbumUsecase,
+		*updateAlbumUsecase,
+		*deleteAlbumUsecase,
+	)
 
-	router.GET("/albums", albumCon.GetAlbums)
+	router.GET("/albums", albumCon.ListAlbums)
 	router.GET("/albums/:id", albumCon.GetAlbumByID)
 	router.POST("/albums", albumCon.CreateAlbum)
 	router.PUT("/albums", albumCon.UpdateAlbum)

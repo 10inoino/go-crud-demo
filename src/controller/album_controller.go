@@ -2,36 +2,48 @@ package controller
 
 import (
 	"example/web-service-gin/src/domain"
-	repository_interface "example/web-service-gin/src/repository/interface"
+	"example/web-service-gin/src/usecase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AlbumController struct {
-	albumRepo repository_interface.AlbumRepository
+	createAlbumUsecase usecase.CreateAlbumUsecase
+	getAlbumUsecase    usecase.GetAlbumUsecase
+	listAlbumUsecase   usecase.ListAlbumUsecase
+	updateAlbumUsecase usecase.UpdateAlbumUsecase
+	deleteAlbumUsecase usecase.DeleteAlbumUsecase
 }
 
 func NewAlbumController(
-	albumRepo repository_interface.AlbumRepository,
+	createAlbumUsecase usecase.CreateAlbumUsecase,
+	getAlbumUsecase usecase.GetAlbumUsecase,
+	listAlbumUsecase usecase.ListAlbumUsecase,
+	updateAlbumUsecase usecase.UpdateAlbumUsecase,
+	deleteAlbumUsecase usecase.DeleteAlbumUsecase,
 ) *AlbumController {
 	return &AlbumController{
-		albumRepo: albumRepo,
+		createAlbumUsecase: createAlbumUsecase,
+		getAlbumUsecase:    getAlbumUsecase,
+		listAlbumUsecase:   listAlbumUsecase,
+		updateAlbumUsecase: updateAlbumUsecase,
+		deleteAlbumUsecase: deleteAlbumUsecase,
 	}
 }
 
-func (con *AlbumController) GetAlbums(ctx *gin.Context) {
-	album, err := con.albumRepo.FindAll(ctx)
+func (con *AlbumController) ListAlbums(ctx *gin.Context) {
+	albums, err := con.listAlbumUsecase.Execute(ctx)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	ctx.IndentedJSON(http.StatusOK, album)
+	ctx.IndentedJSON(http.StatusOK, albums)
 }
 
 func (con *AlbumController) GetAlbumByID(ctx *gin.Context) {
 	id := ctx.Param("id")
-	album, err := con.albumRepo.FindById(ctx, id)
+	album, err := con.getAlbumUsecase.Execute(ctx, id)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
@@ -48,7 +60,13 @@ func (con *AlbumController) CreateAlbum(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed bind json"})
 		return
 	}
-	err := con.albumRepo.Save(ctx, newAlbum)
+	err := con.createAlbumUsecase.Execute(
+		ctx,
+		newAlbum.ID,
+		newAlbum.Title,
+		newAlbum.Artist,
+		newAlbum.Price,
+	)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
@@ -59,7 +77,7 @@ func (con *AlbumController) CreateAlbum(ctx *gin.Context) {
 
 func (con *AlbumController) DeleteAlbum(ctx *gin.Context) {
 	id := ctx.Param("id")
-	err := con.albumRepo.DeleteById(ctx, id)
+	err := con.deleteAlbumUsecase.Execute(ctx, id)
 
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
@@ -76,7 +94,13 @@ func (con *AlbumController) UpdateAlbum(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "failed bind json"})
 		return
 	}
-	err := con.albumRepo.Update(ctx, newAlbum)
+	err := con.updateAlbumUsecase.Execute(
+		ctx,
+		newAlbum.ID,
+		newAlbum.Title,
+		newAlbum.Artist,
+		newAlbum.Price,
+	)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return

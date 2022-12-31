@@ -6,19 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AlbumDeleteUsecase struct {
+type DeleteAlbumUsecase struct {
 	albumRepo repository_interface.AlbumRepository
 }
 
-func NewAlbumDeleteUsecase(
+func NewDeleteAlbumUsecase(
 	albumRepo repository_interface.AlbumRepository,
-) *AlbumDeleteUsecase {
-	return &AlbumDeleteUsecase{
+) *DeleteAlbumUsecase {
+	return &DeleteAlbumUsecase{
 		albumRepo: albumRepo,
 	}
 }
 
-func (usecase *AlbumDeleteUsecase) Execute(
+func (usecase *DeleteAlbumUsecase) Execute(
 	ctx *gin.Context,
 	id string,
 ) error {

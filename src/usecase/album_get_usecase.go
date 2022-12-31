@@ -7,19 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AlbumGetUsecase struct {
+type GetAlbumUsecase struct {
 	albumRepo repository_interface.AlbumRepository
 }
 
-func NewAlbumGetUsecase(
+func NewGetAlbumUsecase(
 	albumRepo repository_interface.AlbumRepository,
-) *AlbumGetUsecase {
-	return &AlbumGetUsecase{
+) *GetAlbumUsecase {
+	return &GetAlbumUsecase{
 		albumRepo: albumRepo,
 	}
 }
 
-func (usecase *AlbumGetUsecase) Execute(
+func (usecase *GetAlbumUsecase) Execute(
 	ctx *gin.Context,
 	id string,
 ) (*domain.Album, error) {
